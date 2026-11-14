@@ -1,20 +1,41 @@
 {% extends "base.html" %}
-
 {% block head %}
-    <script type="module" src="{{ request.url_for('static', path='/sky.js').path }}"></script>
+{% if active_slug == "three-body" %}
+<link rel="stylesheet" href="{{ request.url_for('static', path='/three-body.css').path }}">
+<script type="module" src="{{ request.url_for('static', path='/three-body.js').path }}"></script>
+{% else %}
+<script type="module" src="{{ request.url_for('static', path='/sky.js').path }}"></script>
+{% endif %}
 {% endblock %}
-
 {% block content %}
-    {% set section = sections[active_slug] %}
-    <section class="section-panel" aria-labelledby="section-title">
-        <canvas class="section-panel__sky" data-sky aria-hidden="true"></canvas>
-        <div class="section-panel__content glass">
-            <p class="panel-label">{{ 'В будущем' if section.future else 'В разработке' }}</p>
-            <h1 id="section-title">{{ section.title }}</h1>
-            <p class="section-panel__description">{{ section.description }}</p>
-            <a class="button" href="{{ request.url_for('home').path }}">
-                <span aria-hidden="true">←</span> К Солнечной системе
-            </a>
-        </div>
-    </section>
+{% set section = sections[active_slug] %}
+{% if active_slug == "three-body" %}
+<section class="lab">
+  <header class="lab-head"><div><p class="eyebrow">Интерактивная лаборатория</p><h1>Задача трёх тел</h1>
+  <p class="intro">Исследуй гравитационное взаимодействие трёх тел. Меняй начальные условия и наблюдай, как меняются траектории.</p></div>
+  <span id="status" aria-live="polite">Симуляция запущена</span></header>
+  <div class="lab-grid">
+    <div class="stage"><canvas id="three-canvas" aria-label="Движение трёх гравитирующих тел"></canvas>
+      <div class="legend"><span>● Тело 1</span><span>● Тело 2</span><span>● Тело 3</span></div>
+      <p class="hint">Перетаскивай тела мышью или пальцем, чтобы менять их начальные положения.</p>
+    </div>
+    <aside class="controls glass">
+      <section><h2>Управление</h2><div class="buttons"><button class="button button--primary" id="pause">Пауза</button><button class="button" id="reset">Сбросить</button></div>
+      <label>Скорость <output id="speed-out">1×</output><input id="speed" type="range" min=".25" max="3" step=".25" value="1"></label>
+      <label>Длина траекторий <output id="trail-out">100%</output><input id="trail" type="range" min="10" max="100" step="10" value="100"></label></section>
+      <section><h2>Начальные условия</h2>
+      <label>Масштаб начальных скоростей <output id="velocity-out">100%</output><input id="velocity" type="range" min="50" max="150" value="100"></label>
+      <label>Сценарий<select id="preset"><option value="figure8">Периодическая траектория («восьмёрка»)</option><option value="triangle">Треугольная конфигурация</option><option value="chaos">Неустойчивая конфигурация</option></select></label></section>
+      <section class="readout"><h2>Показатели модели</h2><p>Время модели <strong id="time">0,00</strong></p><p>Полная энергия <strong id="energy">—</strong></p><p>Шаг интегрирования <strong>0,002</strong></p></section>
+    </aside>
+  </div>
+  <p class="footnote">Учебная двумерная модель ньютоновского притяжения с безразмерными единицами и одинаковыми массами. Это не точная модель конкретной звёздной системы. При очень близком сближении тел численная погрешность может возрастать.</p>
+</section>
+{% else %}
+<section class="section-panel" aria-labelledby="section-title">
+<canvas class="section-panel__sky" data-sky aria-hidden="true"></canvas>
+<div class="section-panel__content glass"><p class="panel-label">{{ 'В будущем' if section.future else 'В разработке' }}</p>
+<h1 id="section-title">{{ section.title }}</h1><p class="section-panel__description">{{ section.description }}</p>
+<a class="button" href="{{ request.url_for('home').path }}">← К Солнечной системе</a></div></section>
+{% endif %}
 {% endblock %}
